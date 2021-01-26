@@ -1,0 +1,120 @@
+---
+title: "SurveyAnswers"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+```{r}
+rename <- function(data) {
+    names(data)[1] <- "time"
+}
+```
+
+
+```{r}
+unsafe <- read.csv(file = "SurveyAnswers/unsafe_survey_answers_raw.csv") %>% 
+  mutate(type = "unsafe")
+safe <- read.csv(file = "SurveyAnswers/safe_survey_answers_raw.csv") %>% 
+  mutate(type = "safe")
+
+combined <- rbind(safe,unsafe)
+
+combined$g_gender <- as.factor(combined$g_gender)
+combined$g_age <- as.factor(combined$g_age)
+combined$g_hours_per_week_websites <- as.factor(combined$g_hours_per_week_websites)
+combined$g_amount_online_shop <- as.factor(combined$g_amount_online_shop)
+combined$g_read_privacy <- as.factor(combined$g_read_privacy)
+combined$g_read_terms <- as.factor(combined$g_read_terms)
+combined$g_shop_unknown <- as.factor(combined$g_shop_unknown)
+combined$X1_design_stay_choc <- as.factor(combined$X1_design_stay_choc)
+combined$X1_information_stay_choc <- as.factor(combined$X1_information_stay_choc)
+combined$X1_logos_stay_choc <- as.factor(combined$X1_logos_stay_choc)
+combined$X1_pictures_stay_choc <- as.factor(combined$X1_pictures_stay_choc)
+combined$X1_text_stay_choc <- as.factor(combined$X1_text_stay_choc)
+combined$X1_design_stay_soap <- as.factor(combined$X1_design_stay_soap)
+combined$X1_information_stay_soap <- as.factor(combined$X1_information_stay_soap)
+combined$X1_logos_stay_soap <- as.factor(combined$X1_logos_stay_soap)
+combined$X1_pictures_stay_soap <- as.factor(combined$X1_pictures_stay_soap)
+combined$X1_text_stay_soap <- as.factor(combined$X1_text_stay_soap)
+combined$X2_influence_desc_choc <- as.factor(combined$X2_influence_desc_choc)
+combined$X2_influence_rating_choc <- as.factor(combined$X2_influence_rating_choc)
+combined$X2_influence_availability_choc <- as.factor(combined$X2_influence_availability_choc)
+combined$X2_influence_review_choc <- as.factor(combined$X2_influence_review_choc)
+combined$X2_influence_design_choc <- as.factor(combined$X2_influence_design_choc)
+combined$X2_influence_desc_soap <- as.factor(combined$X2_influence_desc_soap)
+combined$X2_influence_rating_soap <- as.factor(combined$X2_influence_rating_soap)
+combined$X2_influence_availability_soap <- as.factor(combined$X2_influence_availability_soap)
+combined$X2_influence_review_soap <- as.factor(combined$X2_influence_review_soap)
+combined$X2_influence_design_soap <- as.factor(combined$X2_influence_design_soap)
+combined$X3_sec_amount_choc <- as.factor(combined$X3_sec_amount_choc)
+combined$X3_sec_sensetivity_choc <- as.factor(combined$X3_sec_sensetivity_choc)
+combined$X3_sec_design_choc <- as.factor(combined$X3_sec_design_choc)
+combined$X3_sec_payment_choc <- as.factor(combined$X3_sec_payment_choc)
+combined$X3_sec_thirdparty_choc <- as.factor(combined$X3_sec_thirdparty_choc)
+combined$X3_sec_amount_soap <- as.factor(combined$X3_sec_amount_soap)
+combined$X3_sec_sensetivity_soap <- as.factor(combined$X3_sec_sensetivity_soap)
+combined$X3_sec_design_soap <- as.factor(combined$X3_sec_design_soap)
+combined$X3_sec_payment_soap <- as.factor(combined$X3_sec_payment_soap)
+combined$X3_sec_thirdparty_soap <- as.factor(combined$X3_sec_thirdparty_soap)
+combined$X4_trustworthy <- as.factor(combined$X4_trustworthy)
+combined$type <- as.factor(combined$type)
+combined <- combined %>% mutate_if(is.numeric, as.factor)
+```
+
+```{r}
+ggplot(combined, aes(X1_prefer, fill = type)) +
+  geom_bar()
+ggplot(combined, aes(X2_prefer, fill = type)) +
+  geom_bar()
+ggplot(combined, aes(X3_prefer, fill = type)) +
+  geom_bar()
+```
+
+
+```{r}
+data <- combined %>% 
+  separate_rows(g_payment_types, sep= ";")
+
+data$g_payment_types <- as.factor(data$g_payment_types)
+
+data <- data %>% 
+  arrange(desc(g_payment_types))
+
+ggplot(data, aes(x = "" , y = g_payment_types, fill = g_payment_types)) +
+  geom_bar(stat = "identity", width = 1) + 
+  coord_polar("y", start = 0) +
+  theme_void()
+```
+
+
+```{r}
+data <- combined %>% 
+  arrange(desc(g_amount_online_shop))
+
+ggplot(data, aes(x = "" , y = g_amount_online_shop, fill = g_amount_online_shop)) +
+  geom_bar(stat = "identity", width = 1) + 
+  coord_polar("y", start = 0) +
+  theme_void()
+```
+
+
+```{r}
+data <- combined %>% 
+  arrange(desc(g_customer_reviews))
+
+ggplot(data, aes(x = "" , y = g_customer_reviews, fill = g_customer_reviews)) +
+  geom_bar(stat = "identity", width = 1) + 
+  coord_polar("y", start = 0) +
+  theme_void()
+```
+
+
+```{r}
+summary(combined)
+```
+
+
