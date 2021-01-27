@@ -749,6 +749,8 @@ ggplot(data, aes(x = X4_trustworthy, y = n, fill = type)) +
     y = "Count",
     fill = "Type"
   )
+
+summary(filter(data, type == "unsafe")$X4_trustworthy)
 ```
 
 
