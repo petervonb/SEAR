@@ -750,7 +750,7 @@ ggplot(data, aes(x = X4_trustworthy, y = n, fill = type)) +
     fill = "Type"
   )
 
-summary(filter(data, type == "unsafe")$X4_trustworthy)
+summary(filter(combined, type == "unsafe")$X4_trustworthy)
 ```
 
 
