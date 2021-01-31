@@ -72,12 +72,19 @@ ggplot(combined, aes(g_gender, fill = g_gender)) +
 ```{r}
 ggplot(combined, aes(g_age, fill = g_age)) +
   geom_bar(show.legend = F) + 
+  coord_flip() +
   labs(
     title = "Age Distribution",
     x = "",
     y = "Count",
     fill = ""
+<<<<<<< HEAD
   ) + scale_fill_brewer(palette="YlGn")
+=======
+  )
+
+NROW(combined$g_age[combined$g_age == "18 to 24"])
+>>>>>>> 47e17aa7656184cf941d95683d03b854c7fe146b
 ```
 
 ```{r}
@@ -87,8 +94,15 @@ ggplot(combined, aes(g_hours_per_week_websites, fill = g_hours_per_week_websites
     title = "Hours spend on websites per week",
     x = "",
     y = "Count"
+<<<<<<< HEAD
   ) + scale_fill_brewer(palette="YlGn")
 summary(combined$g_hours_per_week_websites)
+=======
+  )
+NROW(combined$g_hours_per_week_websites[combined$g_hours_per_week_websites == "Less than 5 hours"])
+NROW(combined$g_hours_per_week_websites[combined$g_hours_per_week_websites == "Less than an hour"])
+
+>>>>>>> 47e17aa7656184cf941d95683d03b854c7fe146b
 ```
 
 ```{r}
