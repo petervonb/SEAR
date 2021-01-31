@@ -66,7 +66,7 @@ ggplot(combined, aes(g_gender, fill = g_gender)) +
     x = "",
     y = "Count",
     fill = ""
-  )
+  ) + scale_fill_brewer(palette="YlGn")
 ```
 
 ```{r}
@@ -77,7 +77,7 @@ ggplot(combined, aes(g_age, fill = g_age)) +
     x = "",
     y = "Count",
     fill = ""
-  )
+  ) + scale_fill_brewer(palette="YlGn")
 ```
 
 ```{r}
@@ -87,7 +87,8 @@ ggplot(combined, aes(g_hours_per_week_websites, fill = g_hours_per_week_websites
     title = "Hours spend on websites per week",
     x = "",
     y = "Count"
-  )
+  ) + scale_fill_brewer(palette="YlGn")
+summary(combined$g_hours_per_week_websites)
 ```
 
 ```{r}
@@ -97,7 +98,8 @@ ggplot(combined, aes(g_amount_online_shop, fill = g_amount_online_shop)) +
     title = "How often shopping online",
     x = "",
     y = "Count"
-  )
+  ) + scale_fill_brewer(palette="YlGn")
+summary(combined$g_amount_online_shop)
 ```
 
 
@@ -113,7 +115,9 @@ ggplot(data, aes(g_payment_types, fill = g_payment_types)) +
   scale_x_discrete(guide = guide_axis(n.dodge = 2)) +
   labs(title = "Payment Methods",
        x = "",
-       y = "Count")
+       y = "Count"
+  ) + scale_fill_brewer(palette="YlGn")
+summary(data$g_payment_types)
 ```
 
 ```{r}
@@ -123,7 +127,8 @@ ggplot(combined, aes(g_customer_reviews, fill = g_customer_reviews)) +
     title = "How important are reviews",
     x = "",
     y = "Count"
-  )
+  ) + scale_fill_brewer(palette="YlGn")
+summary(combined$g_customer_reviews)
 ```
 
 ```{r}
@@ -133,17 +138,18 @@ ggplot(combined, aes(g_website_security, fill = g_website_security)) +
     title = "How important is security",
     x = "",
     y = "Count"
-  )
+  ) + scale_fill_brewer(palette="YlGn")
+summary(combined$g_website_security)
 ```
 
 ```{r}
 ggplot(combined, aes(g_evaluation, fill = g_evaluation)) + 
   geom_bar(show.legend = F) + 
   labs(
-    title = "How good can you evaluate",
+    title = "How good can you evaluate a websites security?",
     x = "",
     y = "Count"
-  )
+  ) + scale_fill_brewer(palette="YlGn")
 ```
 
 ```{r}
@@ -153,7 +159,7 @@ ggplot(combined, aes(g_design, fill = g_design)) +
     title = "How important is design",
     x = "",
     y = "Count"
-  )
+  ) + scale_fill_brewer(palette="YlGn")
 ```
 
 ```{r}
@@ -163,7 +169,10 @@ ggplot(combined, aes(g_privacy, fill = g_privacy)) +
     title = "How important is privacy",
     x = "",
     y = "Count"
-  )
+  ) + scale_fill_brewer(palette="YlGn")
+
+#x <- combined %>% group_by(g_privacy) %>% summarize(n = n()) %>% mutate(x = as.integer(g_privacy) * n)
+#sum(x$x)
 ```
 
 ```{r}
@@ -173,7 +182,9 @@ ggplot(combined, aes(g_read_privacy, fill = g_read_privacy)) +
     title = "Who reads privacy",
     x = "",
     y = "Count"
-  )
+  ) + scale_fill_brewer(palette="YlGn")
+summary(combined$g_read_privacy)
+summary(combined$g_read_terms)
 ```
 ```{r}
 ggplot(combined, aes(g_read_terms, fill = g_read_terms)) + 
@@ -185,25 +196,17 @@ ggplot(combined, aes(g_read_terms, fill = g_read_terms)) +
   )
 ```
 ```{r}
-ggplot(combined, aes(g_privacy, fill = g_privacy)) + 
-  geom_bar(show.legend = F) + 
-  labs(
-    title = "Who reads privacy",
-    x = "",
-    y = "Count"
-  )
-```
-```{r}
 data <- combined %>% 
   filter(g_shop_unknown == "No" | g_shop_unknown == "Yes" | g_shop_unknown == "Only, if the website looks trustworthy to me")
-ggplot(data, aes(g_shop_unknown, fill = g_shop_unknown)) + 
+ggplot(combined, aes(g_shop_unknown, fill = g_shop_unknown)) + 
   geom_bar(show.legend = F) + 
   scale_x_discrete(guide = guide_axis(n.dodge = 4)) +
   labs(
-    title = "Who shops unknown",
+    title = "Would you shop on a website you have never heard of before?",
     x = "",
     y = "Count"
-  )
+  ) + scale_fill_brewer(palette="YlGn")
+summary(combined$g_shop_unknown)
 ```
 
 
@@ -218,508 +221,384 @@ ggplot(data, aes(g_aspects_to_know, fill = g_aspects_to_know)) +
   scale_x_discrete(guide = guide_axis(n.dodge = 2)) +
   labs(title = "Aspects to know",
        x = "",
-       y = "Count")
+       y = "Count"
+  ) + scale_fill_brewer(palette="YlGn")
 ```
+
+```{r}
+c <- combined %>% 
+  filter(X4_trustworthy != "None of them look trustworthy")
+data <- c %>% 
+  group_by(type, X1_prefer) %>% 
+  summarize(n = n()) %>% 
+  mutate(page = "landing", value = X1_prefer)
+data2 <- c %>% 
+  group_by(type, X2_prefer) %>% 
+  summarize(n = n()) %>% 
+  mutate(page = "product", value = X2_prefer)
+data3 <- c %>% 
+  group_by(type, X3_prefer) %>% 
+  summarize(n = n()) %>% 
+  mutate(page = "checkout", value = X3_prefer)
+
+d <- rbind(data, data2) %>% 
+  rbind(data3)
+
+ggplot(d, aes(x = value, y = n, fill = type, color = page)) + 
+  geom_bar(position = "dodge", stat = "identity")  + 
+  labs(
+    title = "Which shop do you prefer? (Any of them look trustworthy)",
+    x = "1 = Chocolate Shop | 5 = Soap Shop",
+    y = "Count",
+    fill = "Variable",
+    color = "Type"
+  ) + scale_fill_brewer(palette="YlGn")  + scale_color_brewer(palette="Set1")
+```
+
 
 ```{r}
 data <- combined %>% 
   group_by(type, X1_prefer) %>% 
-  summarize(n = n())
+  summarize(n = n()) %>% 
+  mutate(value = X1_prefer)
 
 ggplot() + 
-  geom_bar(data, mapping = aes(x = X1_prefer, y = n, fill = type), position = "dodge", stat = "identity")
+  geom_bar(data, mapping = aes(x = X1_prefer, y = n, fill = type), position = "dodge", stat = "identity") + scale_fill_brewer(palette="YlGn") +
+  labs(
+    title = "Which shop would you prefer"
+  )
 
 data <- combined %>% 
   group_by(type, X2_prefer) %>% 
   summarize(n = n())
 
 ggplot() + 
-  geom_bar(data, mapping = aes(x = X2_prefer, y = n, fill = type), position = "dodge", stat = "identity")
+  geom_bar(data, mapping = aes(x = X2_prefer, y = n, fill = type), position = "dodge", stat = "identity") + scale_fill_brewer(palette="YlGn")
 
 data <- combined %>% 
   group_by(type, X3_prefer) %>% 
   summarize(n = n())
 
 ggplot() + 
-  geom_bar(data, mapping = aes(x = X3_prefer, y = n, fill = type), position = "dodge", stat = "identity")
+  geom_bar(data, mapping = aes(x = X3_prefer, y = n, fill = type), position = "dodge", stat = "identity") + scale_fill_brewer(palette="YlGn")
 ```
 
 ```{r}
 data <- combined %>% 
   group_by(type, X1_continue_choc) %>% 
   summarize(n = n())
+data
 
-ggplot(data, aes(x = X1_continue_choc, y = n, fill = type)) + 
+plot1 <- ggplot(data, aes(x = X1_continue_choc, y = n, fill = type)) + 
   geom_bar(position = "dodge", stat = "identity")  + 
   labs(
-    title = "Continue choc",
+    title = "ChocShop",
     x = "",
     y = "Count",
     fill = "Type"
-  )
+  ) + scale_fill_brewer(palette="YlGn")
 
 data <- combined %>% 
   group_by(type, X1_continue_soap) %>% 
   summarize(n = n())
+data
 
-ggplot(data, aes(x = X1_continue_soap, y = n, fill = type)) + 
+plot2 <- ggplot(data, aes(x = X1_continue_soap, y = n, fill = type)) + 
   geom_bar(position = "dodge", stat = "identity")  + 
   labs(
-    title = "Continue soap",
+    title = "SoapShop",
     x = "",
     y = "Count",
     fill = "Type"
-  )
+  ) + scale_fill_brewer(palette="YlGn")
+
+require(gridExtra)
+grid.arrange(plot1, plot2, ncol=2, top = "How likely are you to continue on the shop?")
 ```
 
 ```{r}
 data <- combined %>% 
   group_by(type, X1_design_stay_choc) %>% 
-  summarize(n = n())
+  summarize(n = n()) %>% 
+  mutate(t = "design", value = X1_design_stay_choc)
+data2 <- combined %>% 
+  group_by(type, X1_information_stay_choc) %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "information", value = X1_information_stay_choc)
+data3 <- combined %>% 
+  group_by(type, X1_logos_stay_choc) %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "logos", value = X1_logos_stay_choc)
+data4 <- combined %>% 
+  group_by(type, X1_pictures_stay_choc) %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "pictures", value = X1_pictures_stay_choc)
+data5 <- combined %>% 
+  group_by(type, X1_text_stay_choc) %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "text", value = X1_text_stay_choc)
 
-ggplot(data, aes(x = X1_design_stay_choc, y = n, fill = type)) + 
+d <- rbind(data, data2) %>% 
+  rbind(data3) %>% 
+  rbind(data4) %>% 
+  rbind(data5)
+
+ggplot(d, aes(x = value, y = n, fill = t, color = type)) + 
   geom_bar(position = "dodge", stat = "identity")  + 
   labs(
-    title = "Continue Design choc",
+    title = "What makes you leave or stay on this page? (ChocShop)",
     x = "",
     y = "Count",
-    fill = "Type"
-  )
+    fill = "Variable",
+    color = "Type"
+  ) + scale_fill_brewer(palette="YlGn")  + scale_color_brewer(palette="Set1")
+```
 
+```{r}
 data <- combined %>% 
   group_by(type, X1_design_stay_soap) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X1_design_stay_soap, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Continue Design soap",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-```
-
-```{r}
-data <- combined %>% 
-  group_by(type, X1_information_stay_choc) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X1_information_stay_choc, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Continue Information choc",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-
-data <- combined %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "design", value = X1_design_stay_soap)
+data2 <- combined %>% 
   group_by(type, X1_information_stay_soap) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X1_information_stay_soap, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Continue Information soap",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-```
-
-```{r}
-data <- combined %>% 
-  group_by(type, X1_logos_stay_choc) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X1_logos_stay_choc, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Continue Logos choc",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-
-data <- combined %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "information", value = X1_information_stay_soap)
+data3 <- combined %>% 
   group_by(type, X1_logos_stay_soap) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X1_logos_stay_soap, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Continue Logos soap",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-```
-
-```{r}
-data <- combined %>% 
-  group_by(type, X1_pictures_stay_choc) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X1_pictures_stay_choc, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Continue Picture choc",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-
-data <- combined %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "logos", value = X1_logos_stay_soap)
+data4 <- combined %>% 
   group_by(type, X1_pictures_stay_soap) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X1_pictures_stay_soap, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Continue Picture soap",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-```
-
-```{r}
-data <- combined %>% 
-  group_by(type, X1_text_stay_choc) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X1_text_stay_choc, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Continue Text choc",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-
-data <- combined %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "pictures", value = X1_pictures_stay_soap)
+data5 <- combined %>% 
   group_by(type, X1_text_stay_soap) %>% 
-  summarize(n = n())
+  summarize(n = n()) %>% 
+  mutate(t = "text", value = X1_text_stay_soap)
 
-ggplot(data, aes(x = X1_text_stay_soap, y = n, fill = type)) + 
+d <- rbind(data, data2) %>% 
+  rbind(data3) %>% 
+  rbind(data4) %>% 
+  rbind(data5)
+
+ggplot(d, aes(x = value, y = n, fill = t, color = type)) + 
   geom_bar(position = "dodge", stat = "identity")  + 
   labs(
-    title = "Continue Text soap",
+    title = "What makes you leave or stay on this page? (SoapShop)",
     x = "",
     y = "Count",
-    fill = "Type"
-  )
+    fill = "Variable",
+    color = "Type"
+  ) + scale_fill_brewer(palette="YlGn")  + scale_color_brewer(palette="Set1")
 ```
 
 ```{r}
 data <- combined %>% 
   group_by(type, X2_influence_desc_choc) %>% 
-  summarize(n = n())
+  summarize(n = n()) %>% 
+  mutate(t = "description", value = X2_influence_desc_choc)
+data2 <- combined %>% 
+  group_by(type, X2_influence_rating_choc) %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "rating", value = X2_influence_rating_choc)
+data3 <- combined %>% 
+  group_by(type, X2_influence_availability_choc) %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "availability", value = X2_influence_availability_choc)
+data4 <- combined %>% 
+  group_by(type, X2_influence_review_choc) %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "review", value = X2_influence_review_choc)
+data5 <- combined %>% 
+  group_by(type, X2_influence_design_choc) %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "design", value = X2_influence_design_choc)
 
-ggplot(data, aes(x = X2_influence_desc_choc, y = n, fill = type)) + 
+d <- rbind(data, data2) %>% 
+  rbind(data3) %>% 
+  rbind(data4) %>% 
+  rbind(data5)
+
+b <- d %>% group_by(t, type) %>% summarize(x = as.integer(value) * n) %>% group_by(t, type) %>% summarize(y = sum(x))
+b <- b %>% mutate(norm = y/sum(b$y))
+b %>% 
+  ggplot(aes(x = t, y = norm, color = type, fill = t))  +
+  geom_bar(position = "dodge", stat = "identity") + 
+  labs(
+    title = "Relative score of factors that influcence the purchase decision (ChocShop)",
+    x = "",
+    y = "Relative Score",
+    fill = "Variable",
+    color = "Type"
+  ) + scale_fill_brewer(palette="YlGn")  + scale_color_brewer(palette="Set1")
+
+ggplot(d, aes(x = value, y = n, fill = t, color = type)) + 
   geom_bar(position = "dodge", stat = "identity")  + 
   labs(
-    title = "Influence Description choc",
+    title = "Score of factors that influcence the purchase decision (ChocShop)",
     x = "",
-    y = "Count",
-    fill = "Type"
-  )
+    y = "Score",
+    fill = "Variable",
+    color = "Type"
+  ) + scale_fill_brewer(palette="YlGn")  + scale_color_brewer(palette="Set1")
+```
 
+```{r}
 data <- combined %>% 
   group_by(type, X2_influence_desc_soap) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X2_influence_desc_soap, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Influence Description soap",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-```
-
-```{r}
-data <- combined %>% 
-  group_by(type, X2_influence_rating_choc) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X2_influence_rating_choc, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Influence Rating choc",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-
-data <- combined %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "description", value = X2_influence_desc_soap)
+data2 <- combined %>% 
   group_by(type, X2_influence_rating_soap) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X2_influence_rating_soap, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Influence Rating soap",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-```
-
-```{r}
-data <- combined %>% 
-  group_by(type, X2_influence_availability_choc) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X2_influence_availability_choc, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Influence Availability choc",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-
-data <- combined %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "rating", value = X2_influence_rating_soap)
+data3 <- combined %>% 
   group_by(type, X2_influence_availability_soap) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X2_influence_availability_soap, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Influence Availability soap",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-```
-
-```{r}
-data <- combined %>% 
-  group_by(type, X2_influence_review_choc) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X2_influence_review_choc, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Influence Review choc",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-
-data <- combined %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "availability", value = X2_influence_availability_soap)
+data4 <- combined %>% 
   group_by(type, X2_influence_review_soap) %>% 
-  summarize(n = n())
+  summarize(n = n()) %>% 
+  mutate(t = "review", value = X2_influence_review_soap)
+data5 <- combined %>% 
+  group_by(type, X2_influence_design_soap) %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "design", value = X2_influence_design_soap)
 
-ggplot(data, aes(x = X2_influence_review_soap, y = n, fill = type)) + 
+d <- rbind(data, data2) %>% 
+  rbind(data3) %>% 
+  rbind(data4) %>% 
+  rbind(data5)
+
+b <- d %>% group_by(t, type) %>% summarize(x = as.integer(value) * n) %>% group_by(t, type) %>% summarize(y = sum(x))
+b <- b %>% mutate(norm = y/sum(b$y))
+b %>% 
+  ggplot(aes(x = t, y = norm, color = type, fill = t))  +
+  geom_bar(position = "dodge", stat = "identity") + 
+  labs(
+    title = "Relative score of factors that influcence the purchase decision (SoapShop)",
+    x = "",
+    y = "Relative Score",
+    fill = "Variable",
+    color = "Type"
+  ) + scale_fill_brewer(palette="YlGn")  + scale_color_brewer(palette="Set1")
+
+ggplot(d, aes(x = value, y = n, fill = t, color = type)) + 
   geom_bar(position = "dodge", stat = "identity")  + 
   labs(
-    title = "Influence Review soap",
+    title = "Score of factors that influcence the purchase decision (SoapShop)",
+    x = "",
+    y = "Score",
+    fill = "Variable",
+    color = "Type"
+  ) + scale_fill_brewer(palette="YlGn")  + scale_color_brewer(palette="Set1")
+```
+
+
+```{r}
+data <- combined %>% 
+  group_by(type, X3_sec_amount_choc) %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "amount of input", value = X3_sec_amount_choc)
+data2 <- combined %>% 
+  group_by(type, X3_sec_sensetivity_choc) %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "sensetivity", value = X3_sec_sensetivity_choc)
+data3 <- combined %>% 
+  group_by(type, X3_sec_design_choc) %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "design", value = X3_sec_design_choc)
+data4 <- combined %>% 
+  group_by(type, X3_sec_payment_choc) %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "payment types", value = X3_sec_payment_choc)
+data5 <- combined %>% 
+  group_by(type, X3_sec_thirdparty_choc) %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "third party", value = X3_sec_thirdparty_choc)
+
+d <- rbind(data, data2) %>% 
+  rbind(data3) %>% 
+  rbind(data4) %>% 
+  rbind(data5)
+
+ggplot(d, aes(x = value, y = n, fill = t, color = type)) + 
+  geom_bar(position = "dodge", stat = "identity")  + 
+  labs(
+    title = "What factors influence your feeling of security? (ChocShop)",
     x = "",
     y = "Count",
-    fill = "Type"
-  )
+    fill = "Variable",
+    color = "Type"
+  ) + scale_fill_brewer(palette="YlGn")  + scale_color_brewer(palette="Set1")
 ```
 
 ```{r}
 data <- combined %>% 
-  group_by(type, X2_influence_design_choc) %>% 
-  summarize(n = n())
+  group_by(type, X3_sec_amount_soap) %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "amount of input", value = X3_sec_amount_soap)
+data2 <- combined %>% 
+  group_by(type, X3_sec_sensetivity_soap) %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "sensetivity", value = X3_sec_sensetivity_soap)
+data3 <- combined %>% 
+  group_by(type, X3_sec_design_soap) %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "design", value = X3_sec_design_soap)
+data4 <- combined %>% 
+  group_by(type, X3_sec_payment_soap) %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "payment types", value = X3_sec_payment_soap)
+data5 <- combined %>% 
+  group_by(type, X3_sec_thirdparty_soap) %>% 
+  summarize(n = n()) %>% 
+  mutate(t = "third party", value = X3_sec_thirdparty_soap)
 
-ggplot(data, aes(x = X2_influence_design_choc, y = n, fill = type)) + 
+d <- rbind(data, data2) %>% 
+  rbind(data3) %>% 
+  rbind(data4) %>% 
+  rbind(data5)
+
+ggplot(d, aes(x = value, y = n, fill = t, color = type)) + 
   geom_bar(position = "dodge", stat = "identity")  + 
   labs(
-    title = "Influence Design choc",
+    title = "What factors influence your feeling of security? (SoapShop)",
     x = "",
     y = "Count",
-    fill = "Type"
-  )
-
-data <- combined %>% 
-  group_by(type, X2_influence_design_soap) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X2_influence_design_soap, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Influence Design soap",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
+    fill = "Variable",
+    color = "Type"
+  ) + scale_fill_brewer(palette="YlGn")  + scale_color_brewer(palette="Set1")
 ```
 
 ```{r}
 data <- combined %>% 
   group_by(type, X3_save_choc) %>% 
-  summarize(n = n())
+  summarize(n = n()) %>%
+  mutate(shop = "choc", score = as.integer(X3_save_choc) * n) %>%
+  group_by(shop, type) %>% 
+  summarize(score = sum(score))
 
-ggplot(data, aes(x = X3_save_choc, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Think choc is save",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-
-data <- combined %>% 
+data2 <- combined %>% 
   group_by(type, X3_save_soap) %>% 
-  summarize(n = n())
+  summarize(n = n()) %>% 
+  mutate(shop = "soap", score = as.integer(X3_save_soap) * n) %>%
+  group_by(shop, type) %>% 
+  summarize(score = sum(score))
 
-ggplot(data, aes(x = X3_save_soap, y = n, fill = type)) + 
+d <- rbind(data, data2)
+
+ggplot(d, aes(x = shop, y = score, fill = type)) + 
   geom_bar(position = "dodge", stat = "identity")  + 
   labs(
-    title = "Think soap is save",
+    title = "Feeling of safety for the shops",
     x = "",
-    y = "Count",
+    y = "Score",
     fill = "Type"
-  )
+  ) + scale_fill_brewer(palette="YlGn")  + scale_color_brewer(palette="Set1")
+
+d
 ```
-
-```{r}
-data <- combined %>% 
-  group_by(type, X3_sec_amount_choc) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X3_sec_amount_choc, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Influence feeling sec amount input",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-
-data <- combined %>% 
-  group_by(type, X3_sec_amount_soap) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X3_sec_amount_soap, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Influence feeling sec amount input",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-```
-
-```{r}
-data <- combined %>% 
-  group_by(type, X3_sec_sensetivity_choc) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X3_sec_sensetivity_choc, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Influence feeling sec sensetivity",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-
-data <- combined %>% 
-  group_by(type, X3_sec_sensetivity_soap) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X3_sec_sensetivity_soap, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Influence feeling sec sensetivity",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-```
-
-```{r}
-data <- combined %>% 
-  group_by(type, X3_sec_design_choc) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X3_sec_design_choc, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Influence feeling sec design",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-
-data <- combined %>% 
-  group_by(type, X3_sec_design_soap) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X3_sec_design_soap, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Influence feeling sec design",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-```
-
-```{r}
-data <- combined %>% 
-  group_by(type, X3_sec_payment_choc) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X3_sec_payment_choc, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Influence feeling sec payment",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-
-data <- combined %>% 
-  group_by(type, X3_sec_payment_soap) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X3_sec_payment_soap, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Influence feeling sec payment",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-```
-
-```{r}
-data <- combined %>% 
-  group_by(type, X3_sec_thirdparty_choc) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X3_sec_thirdparty_choc, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Influence feeling sec third party",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-
-data <- combined %>% 
-  group_by(type, X3_sec_thirdparty_soap) %>% 
-  summarize(n = n())
-
-ggplot(data, aes(x = X3_sec_thirdparty_soap, y = n, fill = type)) + 
-  geom_bar(position = "dodge", stat = "identity")  + 
-  labs(
-    title = "Influence feeling sec third party",
-    x = "",
-    y = "Count",
-    fill = "Type"
-  )
-```
-
 
 ```{r}
 data <- combined %>% 
